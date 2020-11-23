@@ -295,7 +295,7 @@ ALLHiC_build ./ref/SN_flye1_nextpolish4.fasta
 Output of this step is `groups.asm.fasta` and `groups.agp`. `groups.asm.fasta` is the final HiC result.
 
 ## Step 11: Plot chromatin contacting map
-This step is for plotting chromatin contacting map to examine the quality of HiC assembly. The plot will only be perform on linkage groups we selected. All the raw contigs will be ignored in plotting.
+This step is for plotting chromatin contacting map to evaluate the quality of HiC assembly. The plot will only be performed on linkage groups we selected. All the raw contigs will be ignored in plotting.
 
 Following scripts are used to generate a list of group names, parse it to python scripts to generate group length for plotting. Two python scripts [seqlength.py](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/seqlength.py) and [pick_seq_list.py](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/pick_seq_list.py) are offered in this repository. You can also have your own scripts to do this job. I am just offering my solutions here (I am bad at coding so these codes might be silly in some ways).
 ```bash
