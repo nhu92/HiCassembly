@@ -14,7 +14,7 @@ To prepare the softwares in this pipeline, you need to install [ALLHiC](https://
 
 ## Step 1: Index raw nanopore assembly
 This step take raw nanopore aseembly fasta file as input to create index file for both alignment and BAM file operations.
-> When we call 'raw assembly' here, we refer to assembly using nanopore reads assembled by chosen aseemblers, and then polished by NextPolish using NGS read. Noted here, the 'raw assembly' is not 'raw', it is after 4 rounds of polishing. This term will be use for all following steps unless special mentions.
+> When we call "raw assembly" here, we refer to assembly using nanopore reads assembled by chosen aseemblers, and then polished by NextPolish using NGS read. Noted here, the "raw assembly" is not 'raw', it is after 4 rounds of polishing. This term will be use for all following steps unless special mentions.
 
 If your genome assembly is already indexed previously due to other analyzing process, you may skip this step.
 
@@ -74,7 +74,7 @@ This step takes several hours to finish. Output files are pair-end mapping `.sai
 ## Step 3: Filter alignment
 This step will do 1) pre-filter reads without restriction enzyme sites 2) removing low-quality mapping hits 3) converting `.sam` file to `.bam` file.
 
-`PreprocessSAMs.pl` requires a restriction enzyme name used during genome digestion before HiC sequencing. It is either MboI (N|GATC / CTAG|N) or HindIII (A|AGCTT / TTCGA|A). Before processing this step, you need to check the enzyme using for digesting genome by asking the sequencing company. `PreprocessSAMs.pl` will produce `.pos_of_GATC.txt`, `.near_GATC.500.bed`, `.REduced.bam`, `.REduced.paired_only.bam`, and `.REduced.paired_only.flagstat` files. Use the name of `.REduced.paired_only.bam` as the input for `filterBAM_forHiC.pl`.
+`PreprocessSAMs.pl` requires a restriction enzyme name used during genome digestion before HiC sequencing. It is either MboI (N|GATC / CTAG|N) (the same as DpnII) or HindIII (A|AGCTT / TTCGA|A). Before processing this step, you need to check the enzyme using for digesting genome by asking the sequencing company. `PreprocessSAMs.pl` will produce `.pos_of_GATC.txt`, `.near_GATC.500.bed`, `.REduced.bam`, `.REduced.paired_only.bam`, and `.REduced.paired_only.flagstat` files. Use the name of `.REduced.paired_only.bam` as the input for `filterBAM_forHiC.pl`.
 
 ```bash
 #!/bin/sh
@@ -188,7 +188,7 @@ ALLHiC_prune -i ./gmap/Allele.ctg.table -b SE_HiC.bam -r ./ref/SE.finalpolish.fa
 (In progress)
 
 ## Step 6: Partition: Assign contigs into a pre-defined number of groups
-This step runs for assign contigs into groups based on HiC signals. Parameter `-e` refers to restriction enzyme sites (See step 4). Parameter `-k` refers to pre-defined number of groups. In our case, as we know the linkage group number is 19 for willows, `-k` should be 19. However, I was too ambious to expect the software would discriminate X and Y chromosomes for me. Thus, I put 20 for this parameter.
+This step runs for assign contigs into groups based on HiC signals. Parameter `-e` refers to restriction enzyme sites (See step 4). Parameter `-k` refers to pre-defined number of groups. In our case, as we know the linkage group number is 19 for willows, `-k` should be 19. However, I was too ambitious to expect the software would discriminate X and Y chromosomes for me. Thus, I put 20 for this parameter.
 ```bash
 #!/bin/sh
 #$ -V
@@ -199,7 +199,7 @@ This step runs for assign contigs into groups based on HiC signals. Parameter `-
 #$ -l h_vmem=5.3G
 #$ -o log/06/$JOB_NAME.o$JOB_ID
 #$ -e log/06/$JOB_NAME.e$JOB_ID
-#$ -pe sm 36
+#$ -pe sm 6
 #$ -P quanah
 
 module load gnu/5.4.0
@@ -230,14 +230,76 @@ ALLHiC_rescue -r ./ref/SE.finalpolish.fasta -b SE_HiC.bam -c prunning.clusters.t
 ```
 (In progress)
 
-## Step 8: Extract grouping inforation
-(Occupied needs updating)
+## Step 8: Extract grouping information
+This small step is to extract grouping information from alignment files. `--RE` parameter is the same parameter as `-e` in Step 6 asking restriction enzyme site.
+```bash
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N SN_allHiC_extract
+#$ -q omni
+#$ -l h_vmem=5.3G
+#$ -o log/08/$JOB_NAME.o$JOB_ID
+#$ -e log/08/$JOB_NAME.e$JOB_ID
+#$ -pe sm 1
+#$ -P quanah
+
+module load gnu/5.4.0
+
+allhic extract SN_HiC.bam SN_flye1_nextpolish4.fasta --RE GATC
+```
+Output of this step are `.clusters.txt`, `.counts_RE.txt`, `.clm`, `.distribution.txt`, and `.pairs.txt` files.
 
 ## Step 9: Optimize directions of contigs
-(Occupied needs updating)
+This step will correct the directions of contigs in each putative linkage group based on HiC contacting signals. It takes `.clm` file as input and automaticly reads files from the same directory. These files record basic information of Hi-C links between two contigs, including potential ordering and orientation, number of supported reads and distance of paired-end reads. Loop times in code refer to `-k` parameter in Step 6. In `SN_HiC.counts_GATC.20g${K}`, the number "20" refers to the same parameter as well.
+```bash
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N SN_allHiC_optimize
+#$ -q omni
+#$ -l h_vmem=5.3G
+#$ -o log/09/$JOB_NAME.o$JOB_ID
+#$ -e log/09/$JOB_NAME.e$JOB_ID
+#$ -pe sm 6
+#$ -P quanah
+
+module load gnu/5.4.0
+
+for K in {1..20}; do allhic optimize SN_HiC.counts_GATC.20g${K}.txt SN_HiC.clm; done
+```
+Output of this step are `.tour` files. Numbers equals to loop times.
 
 ## Step 10: Build FASTA file
-(Occupied needs updating)
+This step builds up final FASTA file based on `.tour` file connecting contigs together. Make sure every files are in the same folder for software to read.
+```bash
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N SN_allHiC_build
+#$ -q omni
+#$ -l h_vmem=5.3G
+#$ -o log/10/$JOB_NAME.o$JOB_ID
+#$ -e log/10/$JOB_NAME.e$JOB_ID
+#$ -pe sm 6
+#$ -P quanah
+
+module load gnu/5.4.0
+
+ALLHiC_build ./ref/SN_flye1_nextpolish4.fasta
+```
+Output of this step is `groups.asm.fasta` and `groups.agp`. `groups.asm.fasta` is the final HiC result.
 
 ## Step 11: Plot chromatin contacting map
-(Occupied needs updating)
+This step is for plotting chromatin contacting map to examine the quality of HiC assembly. The plot will only be perform on linkage groups we selected. All the raw contigs will be ignored in plotting.
+
+Following scripts are used to generate a list of group names, parse it to python scripts to generate group length for plotting. [seqlength.py](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/seqlength.py) and [pick_seq_list.py]() are offered in this repository. You can also have your own scripts to do this job. I am just offering my solutions here (I am bad at coding so these code might be silly in some way).
+```bash
+grep ">" groups.asm.fasta | head -20 > linkage_groups.list
+python pick_seq_list.py -f groups.asm.fasta -l linkage_groups.list > linkage_groups_only.fasta
+python seqlength.py -f linkage_groups_only.fasta > linkage_groups_length.txt
+```
+
