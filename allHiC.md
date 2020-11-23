@@ -89,11 +89,11 @@ This step will do 1) pre-filter reads without restriction enzyme sites 2) removi
 
 PreprocessSAMs.pl SN_HiC_s1.sam SN_flye1_nextpolish4.fasta MBOI
 filterBAM_forHiC.pl SN_HiC_s1.REduced.paired_only.bam SN_HiC_s1_clean.sam
-samtools view -bt SN_flye1_nextpolish4.fasta.fai SN_HiC_s1_clean.sam > SN_HiC_s1_clean.bam
+samtools view -bt ./ref/SN_flye1_nextpolish4.fasta.fai SN_HiC_s1_clean.sam > SN_HiC_s1_clean.bam
 
 PreprocessSAMs.pl SN_HiC_s2.sam SN_flye1_nextpolish4.fasta MBOI
 filterBAM_forHiC.pl SN_HiC_s2.REduced.paired_only.bam SN_HiC_s2_clean.sam
-samtools view -bt SN_flye1_nextpolish4.fasta.fai SN_HiC_s2_clean.sam > SN_HiC_s2_clean.bam
+samtools view -bt /ref/SN_flye1_nextpolish4.fasta.fai SN_HiC_s2_clean.sam > SN_HiC_s2_clean.bam
 ```
 Output of this step are `_clean.bam` files.
 
@@ -120,7 +120,25 @@ Output of this step is a single `.bam` file.
 (In progress)
 
 ## Step 6: Partition: Assign contigs into a pre-defined number of groups
-(Occupied needs updating)
+This step runs for assign contigs into groups based on HiC signals. Parameter `-e` refers to restriction enzyme sites (See step 4). Parameter `-k` refers to pre-defined number of groups. In our case, as we know the linkage group number is 19 for willows, `-k` should be 19. However, I was too ambious to expect the software would discriminate X and Y chromosomes for me. Thus, I put 20 for this parameter.
+```bash
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N SN_allHiC_partition
+#$ -q omni
+#$ -l h_vmem=5.3G
+#$ -o log/06/$JOB_NAME.o$JOB_ID
+#$ -e log/06/$JOB_NAME.e$JOB_ID
+#$ -pe sm 36
+#$ -P quanah
+
+module load gnu/5.4.0
+
+ALLHiC_partition -b SN_HiC.bam -r ./ref/SN_flye1_nextpolish4.fasta -e GATC -k 20
+```
+Output of this step are list of `.group` files. They are contigs included in each putative linkage groups.
 
 ## Step 7: Rescue: Assign unplaced contigs into partitioned clusters (Optional. Only for ployploids)
 (In progress)
