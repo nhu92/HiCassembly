@@ -4,7 +4,7 @@ Nan Hu / Oct. 18, 2020
 ---
 
 ## Basical introduction
-This pipeline is designed for using HiC sequencing data with nanopore assemblies attempting fetching relatively chromosomal level assemblies. Most of ideas refer to [ALLHiC Github](https://github.com/tangerzhang/ALLHiC/wiki).
+This pipeline is designed for using HiC sequencing data with nanopore assemblies attempting fetching relatively chromosomal level assemblies. Most of ideas are refered to [ALLHiC Github](https://github.com/tangerzhang/ALLHiC/wiki).
 
 The entire workflow for nanopore assembly, NGS data polishment, and HiC chromatin signal incorpration are shown below:
 ![Main Workflow](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/Workflow.png "Workflow")
