@@ -13,12 +13,13 @@ Due to SLURM job submission system in HPCC of TTU, we need to use Juicer version
 However, our jib submission system has a few different command settings that does not compatible to Juicer. Thus, there are some files need to be edited. I have files done for this step, so you can replace these files under `scripts` folder.
 
 Then, we should build up our directory structure like below, assuming our working directory's name is `HiCassembly`:
---HiCassembly
+```
+-- HiCassembly
  |
  |--  scripts             copied from <Juicer Dir>/SLURM/scripts
  |--  restriction_sites
  |--  fastq
  |--  references
  |--  splits
- |--------------
-
+ 
+```
