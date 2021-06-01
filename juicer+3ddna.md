@@ -4,12 +4,12 @@ Nan Hu, May, 2021
 ---
 
 ## Software preparation
-1. Juicer
+1. [Juicer]:https://github.com/aidenlab/juicer
 2. 3D-DNA
 3. last
 
 ## Install Juicer and configuration
-Juicer does not require to install. In order to use Juicer, we only need to run `git clone` from author's github page. There are some required environment for this software.
+Juicer does not require to install. In order to use Juicer, we only need to run `git clone` from author's github page. There are some dependencies for this software.
 
 Becasue SLURM job submission system is installed in HPCC of TTU, we need to use Juicer version for SLURM. After we clone the whole Juicer repository, we need to copy `[Juicer Dir]/SLURM/scripts` to our working directory.
 
@@ -128,8 +128,7 @@ After generating approporate structure of 3d-dna working directory, go to your c
 bash ../3d-dna/run-asm-pipeline.sh -r 10 ../raw_assembly/[raw assembly fasta] ../hic/merged_nodups.txt
 
 ```
-`-r` parameter is the round of polishment (corrections) you want to apply to assembly before scaffolding. Every additional polishment round requires 45 minutes to 1 hour to finish.
+`-r` parameter is the round of polishment (corrections) you want to apply to assembly before scaffolding. Every additional polishment round requires 45 minutes to 1 hour to finish. There will be a `.fasta` file under result directory when it finishes.
 
-
-
+## All to all alignment
 
