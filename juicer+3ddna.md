@@ -90,7 +90,7 @@ bash juicer.sh -d .. -z ../references/[raw nanopore assembly fasta file] \
 This step takes very very long time to finish. You can check the progress by check the error files in `debug` folder. We will get a file called `merged_nodups.txt` under `aligned` folder as our input file for 3D-DNA software.
 
 ## Install 3D-DNA and configuration
-3D-DNA also does not required to install while it need some packages to work. Here is a checklist.
+3D-DNA also does not required to install while it need some packages to work. Here is a [checklist](https://github.com/aidenlab/3d-dna#readme).
 
 The structure of our working directory is below, assuming we have another working directory named `HiCscaffolding`:
 ```
