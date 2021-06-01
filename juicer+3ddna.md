@@ -75,15 +75,61 @@ After configurating the software, we should be able to run Juicer for our HiC in
 
 source ~/.bashrc
 
-bash juicer.sh -d .. -z ../references/[raw nanopore assembly fasta file] -q nocona -y ../restriction_sites/[output of restriction enzyme sites] -t 128 -p ../chrom.sizes -l nocona
+bash juicer.sh -d .. -z ../references/[raw nanopore assembly fasta file] \
+               -q nocona \ 
+               -y ../restriction_sites/[output of restriction enzyme sites] \ 
+               -t 128 \ 
+               -p ../chrom.sizes \ 
+               -l nocona
 
 ```
 This step takes very very long time to finish. You can check the progress by check the error files in `debug` folder. We will get a file called `merged_nodups.txt` under `aligned` folder as our input file for 3D-DNA software.
 
 ## Install 3D-DNA and configuration
-3D-DNA also does not required to install and it need some packages to work. Here is a checklist.
+3D-DNA also does not required to install while it need some packages to work. Here is a checklist.
 
-The structure of our working directory is below:
+The structure of our working directory is below, assuming we have another working directory named `HiCscaffolding`:
+```
+-- HiCscaffolding
+ |
+ |-- 3d-dna            git clone from 3d-dna
+ |-- raw_assembly      contains raw nanopore assembly 
+ |-- hic               contains 'merged_nodups.txt' from Juicer
+ |-- [results folder]  a custome folder to save results
+```
+Our raw assembly need some indexing by running following scripts:
+```bash
+#!/bin/bash
+#SBATCH -J indexing
+#SBATCH -o %x.o%j
+#SBATCH -e %x.e%j
+#SBATCH -p nocona
+#SBATCH -N 1
+#SBATCH -n 16
+
+
+bwa index -a bwtsw [raw assembly] 
+samtools faidx [raw assembly] 
 ```
 
+## Generating HiC scaffolding results (with polishing)
+In order to run this software in parallel way, you may load `gnu parallel` module from HPCC. You can check it with `module spider parallel` and find the latest version of `gnu parallel` module to load.
+
+After generating approporate structure of 3d-dna working directory, go to your custome result folder and create following file:
+```bash
+#!/bin/bash
+#SBATCH -J 3ddnar10
+#SBATCH -o %x.o%j
+#SBATCH -e %x.e%j
+#SBATCH -p nocona
+#SBATCH -N 1
+#SBATCH -n 128
+
+bash ../3d-dna/run-asm-pipeline.sh -r 10 ../raw_assembly/[raw assembly fasta] ../hic/merged_nodups.txt
+
 ```
+`-r` parameter is the round of polishment (corrections) you want to apply to assembly before scaffolding. Every additional polishment round requires 45 minutes to 1 hour to finish.
+
+
+
+
