@@ -8,8 +8,8 @@ Nan Hu, May, 2021
 2. 3D-DNA
 3. last
 
-### Install Juicer and configuration
-Juicer does not require to install. In order to use Juicer, we only need to run `git clone` from author's github page.
+## Install Juicer and configuration
+Juicer does not require to install. In order to use Juicer, we only need to run `git clone` from author's github page. There are some required environment for this software.
 
 Becasue SLURM job submission system is installed in HPCC of TTU, we need to use Juicer version for SLURM. After we clone the whole Juicer repository, we need to copy `[Juicer Dir]/SLURM/scripts` to our working directory.
 
@@ -61,5 +61,29 @@ split -a 3 -l 90000000 -d --additional-suffix=_R2.fastq ../fastq/[.fastq files]
 ```
 Do this for all fastq files.
 
-### Install 3D-DNA and configuration
+## Generate HiC hitmaps by Juicer
 
+After configurating the software, we should be able to run Juicer for our HiC initial assembly. Go to scripts folder then create a submission script like below:
+```bash
+#!/bin/bash
+#SBATCH -J juicer
+#SBATCH -o %x.o%j
+#SBATCH -e %x.e%j
+#SBATCH -p nocona
+#SBATCH -N 6
+#SBATCH -n 128
+
+source ~/.bashrc
+
+bash juicer.sh -d .. -z ../references/[raw nanopore assembly fasta file] -q nocona -y ../restriction_sites/[output of restriction enzyme sites] -t 128 -p ../chrom.sizes -l nocona
+
+```
+This step takes very very long time to finish. You can check the progress by check the error files in `debug` folder. We will get a file called `merged_nodups.txt` under `aligned` folder as our input file for 3D-DNA software.
+
+## Install 3D-DNA and configuration
+3D-DNA also does not required to install and it need some packages to work. Here is a checklist.
+
+The structure of our working directory is below:
+```
+
+```
