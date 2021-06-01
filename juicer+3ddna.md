@@ -4,7 +4,7 @@ Nan Hu, May, 2021
 ---
 
 ## Software preparation
-1. [Juicer]:https://github.com/aidenlab/juicer
+1. [Juicer]https://github.com/aidenlab/juicer
 2. 3D-DNA
 3. last
 
