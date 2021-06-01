@@ -4,16 +4,20 @@ Nan Hu, May, 2021
 ---
 
 ## Software preparation
-1. [Juicer]https://github.com/aidenlab/juicer
-2. 3D-DNA
+1. [Juicer](https://github.com/aidenlab/juicer)
+2. [3D-DNA](https://github.com/aidenlab/3d-dna)
 3. last
 
 ## Install Juicer and configuration
-Juicer does not require to install. In order to use Juicer, we only need to run `git clone` from author's github page. There are some dependencies for this software.
+Juicer does not require to install. In order to use Juicer, we only need to run `git clone` from author's github page. There are some [dependencies](https://github.com/aidenlab/juicer#readme) for this software.
 
-Becasue SLURM job submission system is installed in HPCC of TTU, we need to use Juicer version for SLURM. After we clone the whole Juicer repository, we need to copy `[Juicer Dir]/SLURM/scripts` to our working directory.
+Becasue SLURM job submission system is installed in HPCC of TTU, we need to use Juicer version for SLURM. After we clone the whole Juicer repository, we need to copy `[Juicer Dir]/SLURM/scripts` to our working directory. Then, we should install Juicertools by commands under scripts folder:
+```
+wget https://hicfiles.tc4ga.com/public/juicer/juicer_tools.1.9.9_jcuda.0.8.jar
+ln -s juicer_tools.1.9.9_jcuda.0.8.jar  juicer_tools.jar
+```
 
-However, our job submission system has a few different command settings that does not compatible to Juicer. Thus, there are some files need to be edited. I have files done for this step, so you can replace these files under `scripts` folder.
+However, our job submission system has a few different command settings that does not compatible to Juicer. Thus, there are some files need to be edited. I have files done for this step, so you can replace these files under `scripts` folder. ([juicer.sh](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/juicer.sh), [split_rmdups.awk](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/split_rmdups.awk))
 
 Then, we should build up our directory structure like below, assuming our working directory's name is `HiCassembly`:
 ```
@@ -51,7 +55,7 @@ grep ">" [raw nanopore assembly fasta file] | sed 's/>//g' > contig.namelist
 python seqlength.py -f [raw nanopore assembly fasta file] -l contig.namelist > [output file name]
 
 ```
-seqlength.py is available in miscellaneous folder.
+[seqlength.py](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/seqlength.py) is available in miscellaneous folder.
 
 For `splits` folder, we need to split fastq files into pieces for software to run. Here are some commands to generate the splits. This step takes very long time to finish.
 ```bash
