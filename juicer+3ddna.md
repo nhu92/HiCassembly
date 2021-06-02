@@ -32,7 +32,10 @@ Then, we should build up our directory structure like below, assuming our workin
 ```
 For `references` folder, we need to copy our raw nanopore assembly fasta file into it.
 
-For `fastq` folder, we need to copy our raw HiC sequencing reads into it.
+For `fastq` folder, we need to copy our raw HiC sequencing reads into it. Juicer only treat with unzipped reads. Thus, if input fastq file is `.fastq.gz`, we need to unzip it by:
+```bash
+gunzip [.fastq.gz file]
+```
 
 For `restriction_sites` folder, we need to generate a file include all restrcition enzyme cutting sites on our raw assembled genome. There is a python script under `[Juicer Dir]/misc` named `generate_site_positions.py`. Here is the submission scripts:
 ```bash
@@ -135,4 +138,32 @@ bash ../3d-dna/run-asm-pipeline.sh -r 10 ../raw_assembly/[raw assembly fasta] ..
 `-r` parameter is the round of polishment (corrections) you want to apply to assembly before scaffolding. Every additional polishment round requires 45 minutes to 1 hour to finish. There will be a `.fasta` file under result directory when it finishes.
 
 ## All to all alignment
+All to all alignment is applied to examine the assembly quality by comparing assembly to well-done closed species genome assembly, as we assume there was no significant chromosomal rearrangement between closed related species.
+
+We use lastz to run all-to-all alignment by `multiple` mode. Here is the command:
+```bash
+#!/bin/bash
+#SBATCH -J lastz
+#SBATCH -o %x.o%j
+#SBATCH -e %x.e%j
+#SBATCH -p nocona
+#SBATCH -N 1
+#SBATCH -n 64
+
+lastz SUBJECT_GENOME.fasta[multiple] QUERRY_GENOME.fasta--format=MAF --chain --gapped --transition --maxwordcount=4 --exact=100 --step=20 > RESULTS.maf
+
+```
+Normally, it will take 40 min to run the alignment for a genome with 300M size. When `.maf` results generated, we can input it into plotting scripts for plotting:
+```bash
+#!/bin/bash
+#SBATCH -J lastz_plot
+#SBATCH -o %x.o%j
+#SBATCH -e %x.e%j
+#SBATCH -p nocona
+#SBATCH -N 1
+#SBATCH -n 64
+
+/home/nhu/software/last-1133/scripts/last-dotplot RESULT.maf ALL2ALL.png
+
+```
 
