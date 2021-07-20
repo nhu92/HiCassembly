@@ -140,6 +140,14 @@ bash ../3d-dna/run-asm-pipeline.sh -r 10 ../raw_assembly/[raw assembly fasta] ..
 ## All to all alignment
 All to all alignment is applied to examine the assembly quality by comparing assembly to well-done closed species genome assembly, as we assume there was no significant chromosomal rearrangement between closed related species.
 
+Before we apply all to all alignment, we need to select assembled chromosomal-length scaffolds from HiC assemblies in order to avoid short sequences alignment. We can check the length of the assembly by [seqlength.py](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/seqlength.py) also. For example, we expected the number of chromosome in *Salix* would be 19. Thus, to cover major scaffolds and contigs, we can select top 30 longest sequences from `.FINAL.fasta` by:
+```bash
+grep ">" [.FINAL.fasta] | head -30 | sed 's/>//g' > top30.list
+python pick_seq_list.py -f [.FINAL.fasta] -l top30.list -o [output FASTA]
+```
+
+[pick_seq_list.py](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/pick_seq_list.py) is in miscellaneous folder. The output will be used as the querry genome file for lastz software. 
+
 We use lastz to run all-to-all alignment by `multiple` mode. Here is the command:
 ```bash
 #!/bin/bash
