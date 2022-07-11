@@ -16,6 +16,7 @@ Becasue SLURM job submission system is installed in HPCC of TTU, we need to use 
 wget https://hicfiles.tc4ga.com/public/juicer/juicer_tools.1.9.9_jcuda.0.8.jar
 ln -s juicer_tools.1.9.9_jcuda.0.8.jar  juicer_tools.jar
 ```
+> (updated 07/11/2022) Check the newest version of juicer tools. Currently, I use v1.22.01.
 
 However, our job submission system has a few different command settings that does not compatible to Juicer. Thus, there are some files need to be edited. I have files done for this step, so you can replace these files under `scripts` folder. ([juicer.sh](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/juicer.sh), [split_rmdups.awk](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/split_rmdups.awk))
 
@@ -54,13 +55,12 @@ python generate_site_positions.py MboI [Species Name] [raw nanopore assembly fas
 
 `chrom.sizes` is a file contains all the contig/scaffold name and a side column of the legnth for each segments. It can be generated from following commands:
 ```bash
-grep ">" [raw nanopore assembly fasta file] | sed 's/>//g' > contig.namelist
-python seqlength.py -f [raw nanopore assembly fasta file] -l contig.namelist > [output file name]
+python seqlength.py -f [raw nanopore assembly fasta file] > [output file name]
 
 ```
 [seqlength.py](https://github.com/gudusanjiao/HiCassembly/blob/main/miscellaneous/seqlength.py) is available in miscellaneous folder.
 
-For `splits` folder, we need to split fastq files into pieces for software to run. Here are some commands to generate the splits. This step takes very long time to finish.
+For `splits` folder, we need to split fastq files into pieces for software to run. Here are some commands to generate the splits. This step takes long time to finish. You may need to run a submission scripts or run under `interactive` command.
 ```bash
 split -a 3 -l 90000000 -d --additional-suffix=_R1.fastq ../fastq/[.fastq files]
 split -a 3 -l 90000000 -d --additional-suffix=_R2.fastq ../fastq/[.fastq files]
