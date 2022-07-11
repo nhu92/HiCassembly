@@ -2,6 +2,8 @@
 Nan Hu / Oct. 18, 2020
 
 ---
+# We dont use allHiC for our assembly currently. You may go through Juicer + 3D-DNA pipeline now.
+---
 
 ## Introduction
 This pipeline is designed for using HiC sequencing data with nanopore assemblies attempting fetching relatively chromosomal level assemblies. Most of ideas are refered to [ALLHiC Github](https://github.com/tangerzhang/ALLHiC/wiki).
