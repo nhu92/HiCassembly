@@ -104,6 +104,13 @@ The structure of our working directory is below, assuming we have another workin
  |-- hic               contains 'merged_nodups.txt' from Juicer
  |-- [results folder]  a custome folder to save results
 ```
+Our `merged_nodups.txt` file may contain illegal form of data that causing skipping steps in 3d-dna scaffolding. We need to run following command to remove those lines.
+```bash
+awk 'NF==16' merged_nodups.txt > new_merged_nodups.txt
+mv merged_nodups.txt old_merged_nodups.txt
+mv new_merged_nodups.txt merged_nodups.txt
+```
+
 Our raw assembly need some indexing by running following scripts:
 ```bash
 #!/bin/bash
@@ -113,7 +120,6 @@ Our raw assembly need some indexing by running following scripts:
 #SBATCH -p nocona
 #SBATCH -N 1
 #SBATCH -n 16
-
 
 bwa index -a bwtsw [raw assembly] 
 samtools faidx [raw assembly] 
