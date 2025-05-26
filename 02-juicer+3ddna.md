@@ -31,7 +31,7 @@ Then, we should build up our directory structure like below, assuming our workin
  |--  splits              contains fastq file splits
  |--  chrom.sizes         a tablized file has contig names and sizes
 ```
-For `references` folder, we need to copy our raw nanopore assembly fasta file into it.
+For `references` folder, we need to copy our polished nanopore assembly fasta file into it.
 
 For `fastq` folder, we need to copy our raw HiC sequencing reads into it. Juicer only treat with unzipped reads. Thus, if input fastq file is `.fastq.gz`, we need to unzip it by:
 ```bash
