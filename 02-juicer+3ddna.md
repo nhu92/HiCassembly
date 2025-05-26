@@ -27,7 +27,7 @@ Then, we should build up our directory structure like below, assuming our workin
  |--  scripts             copied from [Juicer Dir]/SLURM/scripts
  |--  restriction_sites   generated from raw nanopore assembly by generate_site_positions.py
  |--  fastq               contains fastq file
- |--  references          contains raw nanopore assembly
+ |--  references          contains final polished nanopore assembly
  |--  splits              contains fastq file splits
  |--  chrom.sizes         a tablized file has contig names and sizes
 ```
